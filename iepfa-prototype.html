@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEPFA 2.0 – Complete Role‑Based Portal</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #eef3f9;
+            color: #1e2f3e;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .app { display: flex; height: 100vh; width: 100%; }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            width: 320px;
+            background: white;
+            box-shadow: 6px 0 20px rgba(0, 35, 60, 0.08);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #d9e2ec;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 2rem 1.5rem 1.2rem;
+            background: linear-gradient(135deg, #FF9933 0%, #FFB05C 100%);
+            color: white;
+            border-bottom: 4px solid #138808;
+            text-align: left;
+        }
+        .sidebar-header img { height: 150px; width: 150px; margin-left: 40px;}
+        .sidebar-header h2 { font-weight: 700; font-size: 1.6rem; letter-spacing: 0.5px; margin-left: 60px; line-height: 1.2; }
+        .sidebar-header .sub { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; }
+        .role-badge {
+            background: rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 8px 0 4px;
+            text-transform: uppercase;
+        }
+        .sidebar-nav { flex: 1; padding: 1.5rem 1rem; }
+        .nav-section { margin-bottom: 2rem; display: none; }
+        .nav-section.visible { display: block; }
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #5b6f8c;
+            padding: 0 0.8rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.8rem 1rem;
+            margin: 4px 0;
+            border-radius: 50px;
+            color: #1e2f3e;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: 0.15s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-transform: capitalize;
+        }
+        .nav-item i { width: 24px; color: #FF9933; font-size: 1.1rem; }
+        .nav-item:hover { background: #fff2e0; border-color: #FFB05C; }
+        .nav-item.active {
+            background: #FF9933;
+            color: white;
+            box-shadow: 0 8px 16px rgba(255,153,51,0.3);
+        }
+        .nav-item.active i { color: white; }
+        .info-section {
+            border-top: 2px dashed #cbd5e1;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.7rem 1rem;
+            border-radius: 40px;
+            color: #2e4a6b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            text-transform: capitalize;
+        }
+        .info-item i { color: #138808; width: 24px; }
+        .info-item:hover { background: #e2f0e6; }
+
+        /* ---------- MAIN PANEL ---------- */
+        .main {
+            flex: 1;
+            background: #f5fafd;
+            padding: 2rem 2.5rem;
+            overflow-y: auto;
+            position: relative;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.7rem 2rem;
+            border-radius: 60px;
+            box-shadow: 0 8px 18px rgba(0,40,60,0.04);
+        }
+        .role-indicator {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .tag {
+            background: #FFEAD2;
+            padding: 6px 22px;
+            border-radius: 40px;
+            color: #b35300;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .logout-btn {
+            background: white;
+            border: 1.5px solid #dde0e8;
+            border-radius: 40px;
+            padding: 8px 28px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            text-transform: capitalize;
+        }
+        .logout-btn:hover { background: #FFEAD2; border-color: #FF9933; }
+
+        /* ---------- SCREEN CARDS ---------- */
+        .screen-container { max-width: 1400px; margin: 0 auto; }
+        .screen-card {
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 28px 48px -18px rgba(0,55,80,0.2);
+            padding: 2.2rem 2.5rem;
+            border: 1px solid #f0f5fc;
+        }
+        .screen-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e4edf5;
+            padding-bottom: 1.2rem;
+        }
+        .screen-header i {
+            background: #FFEAD2;
+            padding: 14px;
+            border-radius: 50%;
+            color: #c55f00;
+            font-size: 1.6rem;
+        }
+        .screen-header h2 { font-size: 2rem; font-weight: 600; color: #003057; text-transform: capitalize; }
+
+        /* ---------- FORMS & BUTTONS ---------- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.8rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+        .flex-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin: 1.5rem 0; }
+        .btn {
+            background: white;
+            border: 1.5px solid #cbd5e1;
+            padding: 12px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            text-transform: capitalize;
+        }
+        .btn-primary {
+            background: #FF9933;
+            border-color: #FF9933;
+            color: white;
+            box-shadow: 0 10px 20px -8px #FF9933;
+        }
+        .btn-primary:hover { background: #e5801f; }
+        .btn-outline { border-color: #FF9933; color: #FF9933; }
+        .btn-outline:hover { background: #FFEAD2; }
+        .badge {
+            background: #e2f0e2;
+            color: #138808;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: capitalize;
+        }
+        .badge-warning { background: #fff0d9; color: #b35300; }
+        .badge-danger { background: #ffe2e2; color: #b30000; }
+        .input-field {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1.5px solid #dee7f0;
+            border-radius: 60px;
+            font-size: 1rem;
+            transition: 0.2s;
+            margin-bottom: 1.2rem;
+        }
+        .input-field:focus { border-color: #FF9933; outline: none; box-shadow: 0 0 0 4px #FFE1B3; }
+        .input-icon {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #dee7f0;
+            border-radius: 60px;
+            padding: 0 20px;
+            margin-bottom: 1.2rem;
+        }
+        .input-icon input { border: none; flex:1; padding: 16px 0; background: transparent; }
+        .input-icon i { color: #FF9933; font-size: 1.2rem; }
+        .table-mini { width: 100%; border-collapse: collapse; background: #f9fcff; border-radius: 28px; overflow: hidden; margin: 1.5rem 0; }
+        .table-mini th { background: #e3ecf5; padding: 16px; text-align: left; text-transform: capitalize; }
+        .table-mini td { padding: 16px; border-bottom: 1px solid #d5e1ec; }
+
+        /* ---------- VISITOR HOME STATS ---------- */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 1.8rem;
+            margin: 2.5rem 0;
+        }
+        .stat-card {
+            background: #f0f7fd;
+            border-radius: 30px;
+            padding: 1.8rem 1rem;
+            text-align: center;
+            border: 1px solid white;
+        }
+        .stat-number { font-size: 2.5rem; font-weight: 700; color: #FF9933; }
+        .stat-label { font-weight: 500; color: #1e3a5f; text-transform: capitalize; }
+
+        /* ---------- TABS ---------- */
+        .tab-header { display: flex; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab { padding: 10px 24px; border-radius: 40px; background: #f0f5fa; cursor: pointer; font-weight: 500; text-transform: capitalize; }
+        .tab.active { background: #FF9933; color: white; }
+
+        /* ---------- SCREEN VISIBILITY ---------- */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .footer-line { position: fixed; bottom:0; left:320px; right:0; height: 6px; background: linear-gradient(90deg, #FF9933 33%, #ffffff 33% 66%, #138808 66%); }
+
+        /* ---------- UTILITIES ---------- */
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.8rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .text-small { font-size: 0.85rem; color: #4f6f8f; }
+        label { font-weight: 500; text-transform: capitalize; margin-bottom: 4px; display: block; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="channels4_profile-removebg-preview.png">
+            <h2>ई- IEPFA</h2>
+            <div class="sub">Investor Education & Protection Fund</div>
+            <div class="role-badge" id="sidebarRoleBadge">Visitor</div>
+        </div>
+        <div class="sidebar-nav">
+            <!-- Citizen -->
+            <div id="navCitizen" class="nav-section">
+                <div class="nav-section-title"><i class="fas fa-user"></i> Citizen Services</div>
+                <div class="nav-item" data-screen="screen2"><i class="fas fa-id-card"></i> eKyc / Registration</div>
+                <div class="nav-item" data-screen="screen3"><i class="fas fa-table"></i> Dashboard</div>
+                <div class="nav-item" data-screen="screen4"><i class="fas fa-file-lines"></i> File Claim </div>
+                <div class="nav-item" data-screen="screen5"><i class="fas fa-cloud-arrow-up"></i> Document Upload</div>
+                <div class="nav-item" data-screen="screen6"><i class="fas fa-map-location-dot"></i> Track Claim</div>
+                <div class="nav-item" data-screen="screen7"><i class="fas fa-message"></i> Queries</div>
+            </div>
+            <!-- RTA -->
+            <div id="navRTA" class="nav-section">
+                <div class="nav-section-title"><i class="fas fa-building"></i> RTA / Company</div>
+                <div class="nav-item" data-screen="screen8"><i class="fas fa-table"></i> Rta Dashboard</div>
+                <div class="nav-item" data-screen="screen9"><i class="fas fa-file-lines"></i> Evr Creation (Detailed)</div>
+                <div class="nav-item" data-screen="screen7"><i class="fas fa-message"></i> Clarification Requests</div>
+                <div class="nav-item" data-screen="screenRTAaudit"><i class="fas fa-history"></i> Audit Logs</div>
+                <div class="nav-item" data-screen="screenRTAapi"><i class="fas fa-network-wired"></i> Api Monitor</div>
+                <div class="nav-item" data-screen="screenRTAbulk"><i class="fas fa-upload"></i> Bulk Evr Upload</div>
+            </div>
+            <!-- Officer -->
+            <div id="navOfficer" class="nav-section">
+                <div class="nav-section-title"><i class="fas fa-user-tie"></i> IEPFA Officer</div>
+                <div class="nav-item" data-screen="screen10"><i class="fas fa-chart-bar"></i> Officer Dashboard</div>
+                <div class="nav-item" data-screen="screen11"><i class="fas fa-magnifying-glass"></i> Scrutiny & Evr Review</div>
+                <div class="nav-item" data-screen="screen12"><i class="fas fa-check-double"></i> Sanction Order (Pfms)</div>
+                <div class="nav-item" data-screen="screen13"><i class="fas fa-chart-line"></i> Share Release Auth</div>
+                <div class="nav-item" data-screen="screenPFMSstatus"><i class="fas fa-circle-check"></i> Pfms Status Monitor</div>
+                <div class="nav-item" data-screen="screenShareMonitor"><i class="fas fa-database"></i> Share Reconciliation</div>
+                <div class="nav-item" data-screen="screenCaseClosure"><i class="fas fa-file-circle-check"></i> Case Closure</div>
+                <div class="nav-item" data-screen="screenAuditLog"><i class="fas fa-clock-rotate-left"></i> Audit Log</div>
+                <div class="nav-item" data-screen="screen7"><i class="fas fa-message"></i> Queries (To Rta)</div>
+            </div>
+            <!-- Admin -->
+            <div id="navAdmin" class="nav-section">
+                <div class="nav-section-title"><i class="fas fa-gear"></i> Admin & Audit</div>
+                <div class="nav-item" data-screen="screen14"><i class="fas fa-user-lock"></i> User Management</div>
+                <div class="nav-item" data-screen="screen15"><i class="fas fa-chart-pie"></i> Analytics (Mis)</div>
+                <div class="nav-item" data-screen="screen16"><i class="fas fa-clock-rotate-left"></i> Audit Trail</div>
+            </div>
+            <!-- Information (always visible) -->
+            <div class="info-section">
+                <div class="nav-section-title"><i class="fas fa-circle-info"></i> Information</div>
+                <div class="info-item" onclick="showInfoScreen('screen17')"><i class="fas fa-flag"></i> About Us</div>
+                <div class="info-item" onclick="showInfoScreen('screen18')"><i class="fas fa-briefcase"></i> Services</div>
+                <div class="info-item" onclick="showInfoScreen('screen19')"><i class="fas fa-lightbulb"></i> Investor Awareness</div>
+                <div class="info-item" onclick="showInfoScreen('screen20')"><i class="fas fa-question-circle"></i> Faqs</div>
+                <div class="info-item" onclick="showInfoScreen('screen21')"><i class="fas fa-phone-alt"></i> Contact Us</div>
+            </div>
+        </div>
+        <div style="padding: 1.5rem 1rem; border-top:1px solid #e2eaf3; font-size:0.8rem; color:#4f6f8f;">
+            <i class="fas fa-shield-alt"></i> Ministry of Corporate Affairs
+        </div>
+    </div>
+
+    <!-- MAIN PANEL -->
+    <div class="main">
+        <div class="topbar">
+            <div class="role-indicator">
+                <i class="fas fa-circle-user" style="color:#FF9933; font-size:1.6rem;"></i>
+                <span>Logged in as <strong id="currentRoleDisplay">Visitor</strong></span>
+                <span class="tag" id="roleSpecificHome"></span>
+            </div>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-arrow-right-from-bracket"></i> Exit / Home</button>
+        </div>
+
+        <div class="screen-container" id="screenContainer">
+            <!-- ========== SCREEN 1: VISITOR HOME ========== -->
+            <div id="screen1" class="screen active">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-home"></i><h2>Investor Education & Protection Fund</h2></div>
+                    <div class="stat-grid">
+                        <div class="stat-card"><div class="stat-number">₹8,420 Cr</div><div class="stat-label">Unclaimed Dividend</div></div>
+                        <div class="stat-card"><div class="stat-number">12.5L+</div><div class="stat-label">Shares Transferred</div></div>
+                        <div class="stat-card"><div class="stat-number">2.3L</div><div class="stat-label">Claims Settled</div></div>
+                        <div class="stat-card"><div class="stat-number">94%</div><div class="stat-label">Satisfaction Rate</div></div>
+                    </div>
+                    <p style="margin: 2rem 0 1.2rem; font-size: 1.2rem; font-weight: 500;">Access Your Role-Based Dashboard</p>
+                    <div class="grid-2" style="margin-bottom: 1.5rem;">
+                        <div class="btn" style="padding:2rem; text-align:center; border-radius: 40px;" onclick="showLoginForRole('citizen')">
+                            <i class="fas fa-user fa-3xl" style="color:#FF9933; font-size:2.5rem;"></i><br><strong style="font-size:1.3rem;">Citizen</strong><br>File & Track Claims
+                        </div>
+                        <div class="btn" style="padding:2rem; text-align:center;" onclick="showLoginForRole('rta')">
+                            <i class="fas fa-building fa-3xl" style="color:#1f4d7a; font-size:2.5rem;"></i><br><strong style="font-size:1.3rem;">RTA / Company</strong><br>EVR Verification
+                        </div>
+                        <div class="btn" style="padding:2rem; text-align:center;" onclick="showLoginForRole('officer')">
+                            <i class="fas fa-user-tie fa-3xl" style="color:#b35300; font-size:2.5rem;"></i><br><strong style="font-size:1.3rem;">IEPFA Officer</strong><br>Scrutiny & Approve
+                        </div>
+                        <div class="btn" style="padding:2rem; text-align:center;" onclick="showLoginForRole('admin')">
+                            <i class="fas fa-lock fa-3xl" style="color:#138808; font-size:2.5rem;"></i><br><strong style="font-size:1.3rem;">Admin/Auditor</strong><br>Oversight
+                        </div>
+                    </div>
+                    <p><i class="fas fa-arrow-pointer"></i> Click Any Role To Proceed To Secure Login</p>
+                </div>
+            </div>
+
+            <!-- ========== SCREEN 22: LOGIN ========== -->
+            <div id="screen22" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-right-to-bracket"></i><h2>Secure Login · <span id="selectedRoleSpan">Citizen</span></h2></div>
+                    <div style="background: #f0f7fd; border-radius: 40px; padding: 2rem;">
+                        <div class="input-icon"><i class="fas fa-envelope"></i><input placeholder="Email / Mobile / Pan"></div>
+                        <div class="input-icon mt-2"><i class="fas fa-lock"></i><input type="password" placeholder="Password / Otp"></div>
+                        <div class="flex-row mt-3">
+                            <button class="btn btn-primary" style="flex:1;" onclick="completeLogin()"><i class="fas fa-arrow-right"></i> Login With Credentials</button>
+                        </div>
+                        <div class="flex-row mt-3">
+                            <button class="btn"><i class="fas fa-fingerprint"></i> Aadhaar Otp</button>
+                            <button class="btn"><i class="fas fa-id-card"></i> Digital Signature</button>
+                        </div>
+                        <p class="mt-3 text-small"><i class="fas fa-shield"></i> SSO / Meri Pehchaan Available</p>
+                    </div>
+                    <div class="mt-3"><i class="fas fa-arrow-left"></i> <a href="#" onclick="showScreen('screen1')">Back To Home</a></div>
+                </div>
+            </div>
+
+            <!-- ========== CITIZEN SCREENS ========== -->
+            <div id="screen2" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-id-card"></i><h2>eKYC / Registration</h2></div>
+                    <div class="badge-warning" style="margin-bottom:1.5rem;">⚠️ Not Completed – Please Verify Identity</div>
+                    <div class="grid-2">
+                        <div><label>Full Name</label><input class="input-field" value="Ravi Sharma"></div>
+                        <div><label>Pan</label><input class="input-field" value="ABCDE1234F" readonly></div>
+                        <div><label>Aadhaar</label><div class="input-icon"><i class="fas fa-fingerprint"></i><input value="**** **** 1234"></div></div>
+                        <div><label>Dob</label><input class="input-field" value="15-08-1985"></div>
+                    </div>
+                    <div class="grid-2">
+                        <div><label>Bank Account</label><input class="input-field" value="SBI 1234567890"></div>
+                        <div><label>Ifsc</label><input class="input-field" value="SBIN0000123"></div>
+                    </div>
+                    <div><label>Demat (Dp Id / Client Id)</label><input class="input-field" value="12012300 / 87654321"></div>
+                    <button class="btn btn-primary mt-3" onclick="showScreen('screen3')">Verify & Save → Go To Dashboard</button>
+                </div>
+            </div>
+
+            <div id="screen3" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-table"></i><h2>Citizen Dashboard</h2></div>
+                    <div class="flex-row"><span class="badge">Claims: 3</span><span class="badge">Pending: 1</span><span class="badge">Approved: 2</span></div>
+                    <div class="mt-3" style="background:#FFF0E0; padding:1rem; border-radius:40px;"><i class="fas fa-exclamation-triangle" style="color:#FF9933;"></i> eKYC Completed: <strong>Yes</strong> (Verified)</div>
+                    <table class="table-mini">
+                        <tr><th>SRN</th><th>Status</th><th>Action</th></tr>
+                        <tr><td>IEPFA12345</td><td>RTA Review</td><td><button class="btn btn-outline" onclick="showScreen('screen6')">Track</button></td></tr>
+                    </table>
+                    <button class="btn btn-primary mt-3" onclick="showScreen('screen4')"><i class="fas fa-plus"></i> File New Claim (Entitlement Search)</button>
+                </div>
+            </div>
+
+            <div id="screen4" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-magnifying-glass"></i><h2>Entitlement Search & Claim</h2></div>
+                    <div class="input-icon"><i class="fas fa-search"></i><input placeholder="Enter Pan, Folio Or Demat"></div>
+                    <button class="btn btn-outline mt-3" onclick="alert('Found: 2 Records')">Search</button>
+                    <div class="mt-3">ABC Ltd – Folio 01234 – 150 Shares <button class="btn btn-primary" onclick="showScreen('screen5')">Claim</button></div>
+                    <div>Xyz Ltd – Dividend ₹5,000 <button class="btn btn-primary" onclick="showScreen('screen5')">Claim</button></div>
+                </div>
+            </div>
+
+            <div id="screen5" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-cloud-arrow-up"></i><h2>Document Upload</h2></div>
+                    <div>Id Proof <i class="fas fa-check-circle" style="color:green"></i> Verified</div>
+                    <div>Share Certificate <button class="btn">Upload</button> Ocr: Name Ravi, Folio 01234</div>
+                    <div>Indemnity Bond <button class="btn">Upload</button></div>
+                    <button class="btn btn-primary mt-3" onclick="showScreen('screen6')">Submit & Track</button>
+                </div>
+            </div>
+
+            <div id="screen6" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-map-location-dot"></i><h2>Track Claim SRN IEPFA12345</h2></div>
+                    <div class="flex-row"><span>Filed</span> <i class="fas fa-arrow-right"></i> <span>RTA</span> <i class="fas fa-arrow-right"></i> <span style="font-weight:700;">IEPFA</span> <i class="fas fa-arrow-right"></i> <span>Done</span></div>
+                    <div>Current: Scrutiny By Officer (Expected 7 Days)</div>
+                </div>
+            </div>
+
+            <!-- ========== RTA SCREENS ========== -->
+            <div id="screen8" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-table"></i><h2>RTA Dashboard</h2></div>
+                    <div class="grid-4">
+                        <div class="stat-card">Pending Claims: 45</div>
+                        <div class="stat-card">High Risk: 7</div>
+                        <div class="stat-card">SLA Breach: 3</div>
+                        <div class="stat-card">Clarifications: 12</div>
+                    </div>
+                    <div class="grid-2" style="margin:2rem 0;">
+                        <div><i class="fas fa-filter"></i> Filter By Risk: <button class="btn">High</button><button class="btn">Medium</button></div>
+                        <div><i class="fas fa-clock"></i> SLA Tracker: <span class="badge-warning">Due In 2 Days: 8</span></div>
+                    </div>
+                    <table class="table-mini">
+                        <tr><th>SRN</th><th>Company</th><th>Risk</th><th>Action</th></tr>
+                        <tr><td>SRN6742</td><td>ABC Ltd</td><td><span class="badge-danger">High</span></td><td><button class="btn btn-outline" onclick="showScreen('screen9')">Create EVR</button></td></tr>
+                        <tr><td>SRN7890</td><td>XYZ Infra</td><td><span class="badge-warning">Medium</span></td><td><button class="btn btn-outline">EVR Pending</button></td></tr>
+                    </table>
+                    <div class="flex-row">
+                        <button class="btn" onclick="showScreen('screenRTAbulk')"><i class="fas fa-upload"></i> Bulk EVR Upload</button>
+                        <button class="btn" onclick="showScreen('screenRTAapi')"><i class="fas fa-network-wired"></i> API Monitor</button>
+                        <button class="btn" onclick="showScreen('screenRTAaudit')"><i class="fas fa-history"></i> Audit Logs</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen9" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-file-pen"></i><h2>EVR Creation · SRN6742</h2></div>
+                    <div class="tab-header" id="evrTabs">
+                        <div class="tab active" data-tab="identity">Identity</div>
+                        <div class="tab" data-tab="shareholding">Shareholding</div>
+                        <div class="tab" data-tab="legal">Legal Heir</div>
+                        <div class="tab" data-tab="risk">Risk & Fraud</div>
+                        <div class="tab" data-tab="recommend">Recommendation</div>
+                    </div>
+                    <!-- Tab Contents -->
+                    <div id="tab-identity" class="tab-content">
+                        <div class="grid-2">
+                            <div><label>Pan Match?</label><input class="input-field" value="ABCDE1234F ✓" readonly></div>
+                            <div><label>Name Match?</label><input class="input-field" value="Ravi Sharma ✓" readonly></div>
+                            <div><label>Signature Match?</label><input class="input-field" value="Verified ✓"></div>
+                            <div><label>KYC Compliance</label><input class="input-field" value="Aadhaar Linked ✓"></div>
+                        </div>
+                    </div>
+                    <div id="tab-shareholding" class="tab-content" style="display:none;">
+                        <div><label>Folio Number</label><input class="input-field" value="FOLIO12345" readonly></div>
+                        <div><label>Shares Transferred To IEPFA</label><input class="input-field" value="150 Shares"></div>
+                        <div><label>Dividend Amount</label><input class="input-field" value="₹5,000"></div>
+                        <div><label>Lien/Pledge/Freeze</label><input class="input-field" value="None"></div>
+                    </div>
+                    <div id="tab-legal" class="tab-content" style="display:none;">
+                        <div><label>Death Certificate</label><input class="input-field" value="Attached"></div>
+                        <div><label>Succession Certificate</label><input class="input-field" value="Attached"></div>
+                        <div><label>Indemnity Bond</label><input class="input-field" value="Uploaded"></div>
+                        <div><label>Affidavit</label><input class="input-field" value="Notarized"></div>
+                    </div>
+                    <div id="tab-risk" class="tab-content" style="display:none;">
+                        <div><label>Duplicate Claim Check</label><input class="input-field" value="No Duplicate"></div>
+                        <div><label>Multiple Claims From Same Pan</label><input class="input-field" value="1 Existing"></div>
+                        <div><label>Suspicious Bank Account</label><input class="input-field" value="Clear"></div>
+                        <div><label>Forged Signature?</label><input class="input-field" value="No"></div>
+                    </div>
+                    <div id="tab-recommend" class="tab-content" style="display:none;">
+                        <div><label>Recommendation</label>
+                            <select class="input-field" id="recommendSelect">
+                                <option>Eligible</option>
+                                <option>Rejected</option>
+                                <option>Clarification Required</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex-row mt-3">
+                        <button class="btn btn-primary" onclick="submitEVR()">Submit EVR</button>
+                        <button class="btn" onclick="saveDraft()">Save Draft</button>
+                        <button class="btn btn-outline" onclick="requestClarification()">Request Clarification</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screenRTAaudit" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-history"></i><h2>RTA Audit Logs</h2></div>
+                    <table class="table-mini">
+                        <tr><th>Timestamp</th><th>Action</th><th>User</th></tr>
+                        <tr><td>12 Jan 10:30</td><td>EVR Submitted SRN6742</td><td>RTA_Raj</td></tr>
+                        <tr><td>11 Jan 16:20</td><td>Clarification Sent</td><td>RTA_Neha</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="screenRTAapi" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-network-wired"></i><h2>API Monitor</h2></div>
+                    <div>NSDL API: <span class="badge">Operational</span> | PFMS: <span class="badge">Operational</span> | Last Sync: 2 Min Ago</div>
+                    <div class="mt-3">CDSL API: <span class="badge">Operational</span> | RTA Gateway: <span class="badge">Connected</span></div>
+                </div>
+            </div>
+
+            <div id="screenRTAbulk" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-upload"></i><h2>Bulk EVR Upload</h2></div>
+                    <div class="input-icon"><i class="fas fa-file-csv"></i><input placeholder="Choose CSV Template"></div>
+                    <button class="btn btn-primary mt-3" onclick="alert('Bulk Upload Processing...')">Upload & Validate</button>
+                </div>
+            </div>
+
+            <!-- ========== OFFICER SCREENS ========== -->
+            <div id="screen10" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-chart-bar"></i><h2>Officer Dashboard</h2></div>
+                    <div class="grid-3">
+                        <div class="stat-card">Pending Scrutiny: 24</div>
+                        <div class="stat-card">Approval Queue: 10</div>
+                        <div class="stat-card">PFMS Pending: 5</div>
+                        <div class="stat-card">Share Release: 8</div>
+                        <div class="stat-card">SLA Critical: 3</div>
+                        <div class="stat-card">Rejected Today: 2</div>
+                    </div>
+                    <table class="table-mini">
+                        <tr><th>SRN</th><th>Type</th><th>Risk</th><th>Action</th></tr>
+                        <tr><td>SRN6742</td><td>Dividend+Share</td><td>Medium</td><td><button class="btn btn-outline" onclick="showScreen('screen11')">Scrutinize</button></td></tr>
+                        <tr><td>SRN8901</td><td>Dividend Only</td><td>Low</td><td><button class="btn btn-outline" onclick="showScreen('screen11')">Scrutinize</button></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="screen11" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-magnifying-glass"></i><h2>Scrutiny · SRN6742</h2></div>
+                    <div><strong>EVR Summary:</strong> Identity Verified, Shares:150, Dividend:₹5000</div>
+                    <div><strong>Documents:</strong> <i class="fas fa-file-pdf"></i> Share Cert, <i class="fas fa-file-pdf"></i> Indemnity</div>
+                    <div><strong>Risk Score: <span class="badge-warning">Medium</span></strong></div>
+                    <div class="flex-row">
+                        <button class="btn btn-primary" onclick="showScreen('screen12')">Approve → Sanction</button>
+                        <button class="btn" onclick="showScreen('screen7')">Query RTA</button>
+                        <button class="btn" onclick="rejectClaim()">Reject</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen12" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-check-double"></i><h2>Sanction Order (PFMS)</h2></div>
+                    <div class="grid-2">
+                        <div>SRN: SRN6742</div><div>Dividend: ₹5000</div>
+                        <div>Beneficiary: Ravi Sharma</div><div>Bank: SBI 1234567890, IFSC SBIN0000123</div>
+                    </div>
+                    <div><label>Sanction ID</label><input class="input-field" value="SANC/2025/01234" readonly></div>
+                    <div><label>Budget Head</label><input class="input-field" value="2070-00-105-01"></div>
+                    <button class="btn btn-primary mt-3" onclick="generateSanction()">Generate & Push To PFMS</button>
+                </div>
+            </div>
+
+            <div id="screen13" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-chart-line"></i><h2>Share Release Authorization</h2></div>
+                    <div>SRN: SRN6742 | ISIN: INE123A0101 | Shares: 150</div>
+                    <div>Demat: DP ID 12012300 / Client 87654321</div>
+                    <div>Depository: <select class="input-field"><option>NSDL</option><option>CDSL</option></select></div>
+                    <button class="btn btn-primary mt-3" onclick="releaseShares()">Authorize Release</button>
+                </div>
+            </div>
+
+            <div id="screenPFMSstatus" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-circle-check"></i><h2>PFMS Status Monitor</h2></div>
+                    <table class="table-mini">
+                        <tr><th>Sanction ID</th><th>Amount</th><th>Status</th></tr>
+                        <tr><td>SANC/2025/01234</td><td>₹5000</td><td><span class="badge">Success (Ref:PFMS8765)</span></td></tr>
+                        <tr><td>SANC/2025/01235</td><td>₹12000</td><td><span class="badge-warning">Pending</span></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="screenShareMonitor" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-database"></i><h2>Share Reconciliation</h2></div>
+                    <div>ISIN: INE123A0101 – Total Released: 1500 Shares, Pending: 200</div>
+                    <div>ISIN: INE456B0101 – Released: 3200 Shares, Pending: 0</div>
+                </div>
+            </div>
+
+            <div id="screenCaseClosure" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-file-circle-check"></i><h2>Case Closure</h2></div>
+                    <div>SRN6742: Dividend Paid, Shares Credited → Close Case?</div>
+                    <button class="btn btn-primary mt-3" onclick="closeCase()">Close & Notify Investor</button>
+                </div>
+            </div>
+
+            <div id="screenAuditLog" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-clock-rotate-left"></i><h2>Audit Log (Officer)</h2></div>
+                    <div>10 Jan 10:23 – AO Approved SRN6742</div>
+                    <div>11 Jan 09:15 – GM Approved Sanction SANC/2025/01234</div>
+                </div>
+            </div>
+
+            <!-- ========== QUERY SCREEN (shared) ========== -->
+            <div id="screen7" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-message"></i><h2>Query / Clarification</h2></div>
+                    <div class="badge-warning" style="padding:1rem; border-radius:40px;" id="queryContext">Query From RTA Regarding SRN6742</div>
+                    <textarea class="input-field mt-3" rows="4" placeholder="Type Your Message..."></textarea>
+                    <div class="flex-row">
+                        <button class="btn btn-primary" onclick="sendQuery()">Send</button>
+                        <button class="btn">Attach File</button>
+                    </div>
+                    <div class="mt-3"><strong>Previous Messages:</strong></div>
+                    <div class="mt-2" style="background:#f5f5f5; padding:1rem; border-radius:24px;">RTA: Please provide clearer share certificate. (12 Jan)</div>
+                </div>
+            </div>
+
+            <!-- ========== ADMIN SCREENS ========== -->
+            <div id="screen14" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-user-lock"></i><h2>User Management</h2></div>
+                    <table class="table-mini">
+                        <tr><th>User</th><th>Role</th><th>Status</th></tr>
+                        <tr><td>A. Kumar</td><td>AO</td><td>Active</td></tr>
+                        <tr><td>P. Sharma</td><td>RTA</td><td>Active</td></tr>
+                        <tr><td>V. Singh</td><td>GM</td><td>Active</td></tr>
+                    </table>
+                    <button class="btn btn-primary mt-3">Add User</button>
+                </div>
+            </div>
+
+            <div id="screen15" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-chart-pie"></i><h2>MIS Analytics</h2></div>
+                    <div>Claims: 10,000 | Approval Rate: 82% | Avg TAT: 30 Days</div>
+                    <div>PFMS Success: 95% | Depository Delay: 2 Days Avg</div>
+                    <div style="height:80px; background:#eef3f9; border-radius:40px; margin-top:2rem;"></div>
+                </div>
+            </div>
+
+            <div id="screen16" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-clock-rotate-left"></i><h2>Audit Trail</h2></div>
+                    <table class="table-mini">
+                        <tr><th>Timestamp</th><th>User</th><th>Action</th></tr>
+                        <tr><td>01/01 10:23</td><td>AO</td><td>Approved SRN123</td></tr>
+                        <tr><td>01/01 09:15</td><td>RTA</td><td>EVR Upload SRN6742</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ========== INFORMATION SCREENS ========== -->
+            <div id="screen17" class="screen"><div class="screen-card"><div class="screen-header"><i class="fas fa-flag"></i><h2>About IEPFA</h2></div><p>The Investor Education and Protection Fund Authority (IEPFA) works under the Ministry of Corporate Affairs to protect investor interests and enable recovery of unclaimed assets.</p></div></div>
+            <div id="screen18" class="screen"><div class="screen-card"><div class="screen-header"><i class="fas fa-briefcase"></i><h2>Services</h2></div><ul><li>Claim Unclaimed Dividends & Shares</li><li>Investor Awareness Programs</li><li>Grievance Redressal</li></ul></div></div>
+            <div id="screen19" class="screen"><div class="screen-card"><div class="screen-header"><i class="fas fa-lightbulb"></i><h2>Investor Awareness</h2></div><p>Workshops, Webinars, And Resources To Educate Investors About Financial Literacy And Claiming Rights.</p></div></div>
+            <div id="screen20" class="screen"><div class="screen-card"><div class="screen-header"><i class="fas fa-question-circle"></i><h2>FAQs</h2></div><p><b>How To Claim?</b> File IEPF-5 Online.<br><b>Documents Required?</b> ID, Share Certificate, Etc.</p></div></div>
+            <div id="screen21" class="screen"><div class="screen-card"><div class="screen-header"><i class="fas fa-phone-alt"></i><h2>Contact Us</h2></div><p>Email: help@iepfa.gov.in | Toll-Free: 1800-XXX-XXXX</p></div></div>
+        </div>
+    </div>
+</div>
+<div class="footer-line"></div>
+
+<script>
+    // ---------- ROLE & SCREEN MANAGEMENT ----------
+    let currentRole = null;
+    let pendingRole = null;
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        const navItem = Array.from(document.querySelectorAll('.nav-item')).find(n => n.getAttribute('data-screen') === screenId);
+        if (navItem) navItem.classList.add('active');
+    }
+
+    function showInfoScreen(screenId) {
+        showScreen(screenId);
+    }
+
+    function showLoginForRole(role) {
+        pendingRole = role;
+        document.getElementById('selectedRoleSpan').innerText = role.charAt(0).toUpperCase() + role.slice(1);
+        showScreen('screen22');
+    }
+
+    function completeLogin() {
+        if (!pendingRole) return;
+        setRole(pendingRole);
+    }
+
+    function setRole(role) {
+        currentRole = role;
+        document.getElementById('sidebarRoleBadge').innerText = role.charAt(0).toUpperCase() + role.slice(1);
+        document.getElementById('currentRoleDisplay').innerText = role.charAt(0).toUpperCase() + role.slice(1);
+        document.querySelectorAll('.nav-section').forEach(s => s.classList.remove('visible'));
+        if (role === 'citizen') document.getElementById('navCitizen').classList.add('visible');
+        if (role === 'rta') document.getElementById('navRTA').classList.add('visible');
+        if (role === 'officer') document.getElementById('navOfficer').classList.add('visible');
+        if (role === 'admin') document.getElementById('navAdmin').classList.add('visible');
+
+        let home = 'screen3';
+        if (role === 'rta') home = 'screen8';
+        if (role === 'officer') home = 'screen10';
+        if (role === 'admin') home = 'screen14';
+        showScreen(home);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        currentRole = null;
+        pendingRole = null;
+        document.getElementById('sidebarRoleBadge').innerText = 'Visitor';
+        document.getElementById('currentRoleDisplay').innerText = 'Visitor';
+        document.querySelectorAll('.nav-section').forEach(s => s.classList.remove('visible'));
+        showScreen('screen1');
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const target = item.getAttribute('data-screen');
+            if (target) showScreen(target);
+        });
+    });
+
+    // EVR Tab Switching
+    const tabs = document.querySelectorAll('#evrTabs .tab');
+    const tabContents = {
+        identity: document.getElementById('tab-identity'),
+        shareholding: document.getElementById('tab-shareholding'),
+        legal: document.getElementById('tab-legal'),
+        risk: document.getElementById('tab-risk'),
+        recommend: document.getElementById('tab-recommend')
+    };
+    if (tabs.length) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                Object.values(tabContents).forEach(c => { if (c) c.style.display = 'none'; });
+                if (tabContents[tabName]) tabContents[tabName].style.display = 'block';
+            });
+        });
+    }
+
+    // Action Functions (pop-ups)
+    window.submitEVR = function() {
+        const rec = document.getElementById('recommendSelect')?.value || 'Eligible';
+        if (rec === 'Eligible') alert('✅ EVR Submitted Successfully! Case Forwarded To IEPFA Officer.');
+        else if (rec === 'Rejected') alert('❌ EVR Rejected. Investor Will Be Notified.');
+        else alert('⚠️ Clarification Required. Please Use The "Request Clarification" Button.');
+        showScreen('screen8');
+    };
+    window.saveDraft = function() { alert('📝 EVR Draft Saved.'); };
+    window.requestClarification = function() {
+        document.getElementById('queryContext').innerText = 'Query From RTA Regarding SRN6742';
+        showScreen('screen7');
+    };
+    window.sendQuery = function() { alert('📨 Query Sent.'); showScreen('screen8'); };
+    window.rejectClaim = function() { alert('❌ Claim Rejected.'); showScreen('screen10'); };
+    window.generateSanction = function() { alert('💰 Sanction Order Generated & Pushed To PFMS. Reference: PFMS8765'); showScreen('screenPFMSstatus'); };
+    window.releaseShares = function() { alert('📈 Share Release Instruction Sent To NSDL/CDSL.'); showScreen('screenShareMonitor'); };
+    window.closeCase = function() { alert('✅ Case Closed. Investor Notified.'); showScreen('screen10'); };
+
+    window.onload = () => { showScreen('screen1'); };
+</script>
+</body>
+</html>
