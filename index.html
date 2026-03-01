@@ -270,6 +270,123 @@
         .mb-2 { margin-bottom: 1rem; }
         .text-small { font-size: 0.85rem; color: #4f6f8f; }
         label { font-weight: 500; text-transform: capitalize; margin-bottom: 4px; display: block; }
+                /* ---------- WIZARD STEPPER ---------- */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            counter-reset: step;
+            margin: 4px;
+        }
+        .wizard-step { padding: 4px; }
+        .step-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            color: #9aa9b9;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: capitalize;
+        }
+        .step-item::before {
+            counter-increment: step;
+            content: counter(step);
+            display: block;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 50%;
+            background: #e6ecf3;
+            color: #4e6e8e;
+            margin: 0 auto 8px;
+            font-weight: 700;
+        }
+        .step-item.active { color: #FF9933; }
+        .step-item.active::before { background: #FF9933; color: white; }
+        .step-item.completed { color: #138808; }
+        .step-item.completed::before { background: #138808; color: white; content: '✓'; }
+
+        /* ---------- TIMELINE (TRACK CLAIM) ---------- */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 2.5rem 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #dde3ea;
+            z-index: 1;
+        }
+        .timeline-step {
+            position: relative;
+            z-index: 2;
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 4px solid #dde3ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #5b6f8c;
+        }
+        .timeline-step.completed { border-color: #138808; background: #138808; color: white; }
+        .timeline-step.active { border-color: #FF9933; background: #FF9933; color: white; }
+        .timeline-label {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            color: #2e4a6b;
+        }
+
+        /* ---------- DOCUMENT PREVIEW & RED ALERT ---------- */
+        .doc-preview {
+            background: #f0f7fd;
+            border-radius: 24px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .ocr-box {
+            background: #e9f2fa;
+            border-radius: 20px;
+            padding: 1rem;
+            margin: 3px;
+            font-family: monospace;
+            border-left: 5px solid #FF9933;
+        }
+        .red-alert {
+            background: #ffebee;
+            border: 2px solid #d32f2f;
+            color: #b71c1c;
+            padding: 1rem 1.5rem;
+            border-radius: 60px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .red-alert i { font-size: 1.5rem; }
+
+        /* ---------- SCREEN VISIBILITY ---------- */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .footer-line { position: fixed; bottom:0; left:320px; right:0; height: 6px; background: linear-gradient(90deg, #FF9933 33%, #ffffff 33% 66%, #138808 66%); }
+
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.8rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .text-small { font-size: 0.85rem; color: #4f6f8f; }
+        label { font-weight: 500; text-transform: capitalize; margin-bottom: 4px; display: block; }
     </style>
 </head>
 <body>
@@ -399,7 +516,9 @@
                 </div>
             </div>
 
+
             <!-- ========== CITIZEN SCREENS ========== -->
+            <!-- SCREEN 2: eKYC -->
             <div id="screen2" class="screen">
                 <div class="screen-card">
                     <div class="screen-header"><i class="fas fa-id-card"></i><h2>eKYC / Registration</h2></div>
@@ -419,44 +538,197 @@
                 </div>
             </div>
 
+            <!-- SCREEN 3: Citizen Dashboard -->
             <div id="screen3" class="screen">
                 <div class="screen-card">
-                    <div class="screen-header"><i class="fas fa-table"></i><h2>Citizen Dashboard</h2></div>
+                    <div class="screen-header"><i class="fas fa-chart-simple"></i><h2>Citizen Dashboard</h2></div>
                     <div class="flex-row"><span class="badge">Claims: 3</span><span class="badge">Pending: 1</span><span class="badge">Approved: 2</span></div>
                     <div class="mt-3" style="background:#FFF0E0; padding:1rem; border-radius:40px;"><i class="fas fa-exclamation-triangle" style="color:#FF9933;"></i> eKYC Completed: <strong>Yes</strong> (Verified)</div>
                     <table class="table-mini">
                         <tr><th>SRN</th><th>Status</th><th>Action</th></tr>
                         <tr><td>IEPFA12345</td><td>RTA Review</td><td><button class="btn btn-outline" onclick="showScreen('screen6')">Track</button></td></tr>
                     </table>
-                    <button class="btn btn-primary mt-3" onclick="showScreen('screen4')"><i class="fas fa-plus"></i> File New Claim (Entitlement Search)</button>
+                    <button class="btn btn-primary mt-3" onclick="showScreen('screen4')"><i class="fas fa-plus"></i> File New Claim (6‑Step Wizard)</button>
                 </div>
             </div>
 
+            <!-- SCREEN 4: 6‑Step Claim Wizard -->
             <div id="screen4" class="screen">
                 <div class="screen-card">
-                    <div class="screen-header"><i class="fas fa-magnifying-glass"></i><h2>Entitlement Search & Claim</h2></div>
-                    <div class="input-icon"><i class="fas fa-search"></i><input placeholder="Enter Pan, Folio Or Demat"></div>
-                    <button class="btn btn-outline mt-3" onclick="alert('Found: 2 Records')">Search</button>
-                    <div class="mt-3">ABC Ltd – Folio 01234 – 150 Shares <button class="btn btn-primary" onclick="showScreen('screen5')">Claim</button></div>
-                    <div>Xyz Ltd – Dividend ₹5,000 <button class="btn btn-primary" onclick="showScreen('screen5')">Claim</button></div>
+                    <div class="screen-header"><i class="fas fa-file-lines"></i><h2>File Claim </h2></div>
+                    <!-- Step Indicator -->
+                    <div class="step-indicator" id="stepIndicator">
+                        <div class="step-item active" data-step="1">Type</div>
+                        <div class="step-item" data-step="2">Company</div>
+                        <div class="step-item" data-step="3">Details</div>
+                        <div class="step-item" data-step="4">Bank/Demat</div>
+                        <div class="step-item" data-step="5">Documents</div>
+                        <div class="step-item" data-step="6">Review</div>
+                    </div>
+
+                    <!-- Step 1: Claim Type -->
+                    <div id="step1" class="wizard-step">
+                        <h3>Step 1: Select Claim Type</h3>
+                        <div class="flex-row">
+                            <label><input type="radio" name="claimType" value="dividend" checked> Dividend Only</label>
+                            <label><input type="radio" name="claimType" value="shares"> Shares Only</label>
+                            <label><input type="radio" name="claimType" value="both"> Both</label>
+                        </div>
+                        <button class="btn btn-primary next-step mt-3">Next</button>
+                    </div>
+
+                    <!-- Step 2: Company Search -->
+                    <div id="step2" class="wizard-step" style="display:none;">
+                        <h3>Step 2: Search Company & Folio</h3>
+                        <div class="input-icon"><i class="fas fa-search"></i><input id="companySearch" placeholder="Enter Company Name Or Folio"></div>
+                        <button class="btn btn-outline" onclick="alert('Demo: Found ABC Ltd, Folio 01234')">Search</button>
+                        <div class="mt-3" id="searchResult">Demo Result: ABC Ltd – Folio 01234 – 150 Shares</div>
+                        <div class="flex-row mt-3">
+                            <button class="btn prev-step">Previous</button>
+                            <button class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Claim Details -->
+                    <div id="step3" class="wizard-step" style="display:none;">
+                        <h3>Step 3: Claim Details</h3>
+                        <div><label>Number Of Shares</label><input class="input-field" value="150" id="shares"></div>
+                        <div><label>Dividend Amount (₹)</label><input class="input-field" value="5000" id="dividend"></div>
+                        <div class="flex-row">
+                            <button class="btn prev-step">Previous</button>
+                            <button class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Bank / Demat Selection -->
+                    <div id="step4" class="wizard-step" style="display:none;">
+                        <h3>Step 4: Select Bank & Demat</h3>
+                        <div><label>Bank Account</label>
+                            <select class="input-field">
+                                <option>SBI 1234567890 (Verified)</option>
+                                <option>HDFC 87654321 (Verified)</option>
+                            </select>
+                        </div>
+                        <div><label>Demat Account</label>
+                            <select class="input-field">
+                                <option>12012300 / 87654321 (NSDL)</option>
+                                <option>12098765 / 12345678 (CDSL)</option>
+                            </select>
+                        </div>
+                        <div class="flex-row">
+                            <button class="btn prev-step">Previous</button>
+                            <button class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Document Upload + OCR Preview + Past Uploads -->
+                    <div id="step5" class="wizard-step" style="display:none;">
+                        <h3>Step 5: Upload Documents</h3>
+                        <div class="doc-preview">
+                            <p><strong>Previously Uploaded:</strong></p>
+                            <ul>
+                                <li><i class="fas fa-file-pdf"></i> Share_Certificate_ABC.pdf (12 Jan 2025) – OCR: Name Ravi, Folio 01234</li>
+                                <li><i class="fas fa-file-image"></i> Indemnity_Bond.jpg (12 Jan 2025) – OCR: Verified</li>
+                            </ul>
+                        </div>
+                        <div class="input-icon"><i class="fas fa-cloud-upload-alt"></i><input type="file" multiple></div>
+                        <div class="ocr-box mt-2">
+                            <strong>OCR Preview:</strong> Name: Ravi Sharma, Folio: 01234, Shares: 150, Dividend: ₹5000
+                        </div>
+                        <div class="flex-row mt-3">
+                            <button class="btn prev-step">Previous</button>
+                            <button class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Review & Submit -->
+                    <div id="step6" class="wizard-step" style="display:none;">
+                        <h3>Step 6: Review & Submit</h3>
+                        <div class="grid-2">
+                            <div>Claim Type: Both</div>
+                            <div>Company: ABC Ltd (Folio 01234)</div>
+                            <div>Shares: 150 | Dividend: ₹5000</div>
+                            <div>Bank: SBI 1234567890</div>
+                            <div>Demat: 12012300/87654321</div>
+                            <div>Documents: 2 Files Attached</div>
+                        </div>
+                        <div class="flex-row mt-3">
+                            <button class="btn prev-step">Previous</button>
+                            <button class="btn btn-primary" onclick="submitClaim()">Submit Claim</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- SCREEN 5: Document Manager (Enhanced) -->
             <div id="screen5" class="screen">
                 <div class="screen-card">
-                    <div class="screen-header"><i class="fas fa-cloud-arrow-up"></i><h2>Document Upload</h2></div>
-                    <div>Id Proof <i class="fas fa-check-circle" style="color:green"></i> Verified</div>
-                    <div>Share Certificate <button class="btn">Upload</button> Ocr: Name Ravi, Folio 01234</div>
-                    <div>Indemnity Bond <button class="btn">Upload</button></div>
-                    <button class="btn btn-primary mt-3" onclick="showScreen('screen6')">Submit & Track</button>
+                    <div class="screen-header"><i class="fas fa-cloud-arrow-up"></i><h2>Document Manager</h2></div>
+                    <div class="doc-preview">
+                        <h4>Your Uploaded Documents</h4>
+                        <ul>
+                            <li><i class="fas fa-file-pdf"></i> Share_Certificate_ABC.pdf – Uploaded 12 Jan 2025 <br> <span class="ocr-box" style="display:inline-block; padding:0.5rem;">OCR: Ravi Sharma, Folio 01234, 150 shares</span></li>
+                            <li><i class="fas fa-file-image"></i> Indemnity_Bond.jpg – Uploaded 12 Jan 2025 <br> <span class="ocr-box" style="display:inline-block; padding:0.5rem;">OCR: Notarized, Signed</span></li>
+                            <li><i class="fas fa-file-pdf"></i> Death_Certificate.pdf – Uploaded 10 Jan 2025 <br> <span class="ocr-box" style="display:inline-block; padding:0.5rem;">OCR: Verified</span></li>
+                        </ul>
+                    </div>
+                    <div class="input-icon"><i class="fas fa-plus"></i><input type="file" multiple></div>
+                    <button class="btn btn-primary mt-3">Upload New Document</button>
                 </div>
             </div>
 
+            <!-- SCREEN 6: Track Claim with Timeline -->
             <div id="screen6" class="screen">
                 <div class="screen-card">
                     <div class="screen-header"><i class="fas fa-map-location-dot"></i><h2>Track Claim SRN IEPFA12345</h2></div>
-                    <div class="flex-row"><span>Filed</span> <i class="fas fa-arrow-right"></i> <span>RTA</span> <i class="fas fa-arrow-right"></i> <span style="font-weight:700;">IEPFA</span> <i class="fas fa-arrow-right"></i> <span>Done</span></div>
-                    <div>Current: Scrutiny By Officer (Expected 7 Days)</div>
+                    <!-- Visual Timeline -->
+                    <div style="position:relative; margin:2rem 0;">
+                        <div class="timeline">
+                            <div class="timeline-step completed">1</div>
+                            <div class="timeline-step completed">2</div>
+                            <div class="timeline-step active">3</div>
+                            <div class="timeline-step">4</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:0.5rem;">
+                            <span class="timeline-label">Filed</span>
+                            <span class="timeline-label">RTA Review</span>
+                            <span class="timeline-label">IEPFA Scrutiny</span>
+                            <span class="timeline-label">Completed</span>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div><strong>SRN:</strong> IEPFA12345</div>
+                        <div><strong>Filed On:</strong> 10 Jan 2025</div>
+                        <div><strong>Claim Type:</strong> Shares + Dividend</div>
+                        <div><strong>Current Stage:</strong> IEPFA Scrutiny (Expected 7 Days)</div>
+                        <div><strong>Company:</strong> ABC Ltd (Folio 01234)</div>
+                        <div><strong>Amount:</strong> 150 Shares + ₹5000</div>
+                    </div>
+                    <div class="mt-3"><i class="fas fa-clock"></i> Last Updated: 15 Jan 2025, 10:30 AM</div>
+                </div>
+            </div>
+
+            <!-- SCREEN 7: Queries with Red Alert -->
+            <div id="screen7" class="screen">
+                <div class="screen-card">
+                    <div class="screen-header"><i class="fas fa-message"></i><h2>Queries / Clarifications</h2></div>
+                    <div class="red-alert">
+                        <i class="fas fa-exclamation-circle"></i> You have 2 pending queries requiring your attention.
+                    </div>
+                    <div class="query-item" style="background:#f9fcff; border-radius:24px; padding:1rem; margin-bottom:1rem;">
+                        <strong>From RTA (12 Jan 2025):</strong> Please provide a clearer scan of the share certificate.
+                        <div class="flex-row mt-2">
+                            <textarea class="input-field" placeholder="Type your reply..." rows="2"></textarea>
+                            <button class="btn btn-primary">Send</button>
+                        </div>
+                    </div>
+                    <div class="query-item" style="background:#f9fcff; border-radius:24px; padding:1rem;">
+                        <strong>From IEPFA Officer (14 Jan 2025):</strong> Please confirm the bank account ownership.
+                        <div class="flex-row mt-2">
+                            <textarea class="input-field" placeholder="Type your reply..." rows="2"></textarea>
+                            <button class="btn btn-primary">Send</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -820,6 +1092,55 @@
     window.generateSanction = function() { alert('💰 Sanction Order Generated & Pushed To PFMS. Reference: PFMS8765'); showScreen('screenPFMSstatus'); };
     window.releaseShares = function() { alert('📈 Share Release Instruction Sent To NSDL/CDSL.'); showScreen('screenShareMonitor'); };
     window.closeCase = function() { alert('✅ Case Closed. Investor Notified.'); showScreen('screen10'); };
+
+    window.onload = () => { showScreen('screen1'); };
+// ---------- WIZARD STEP LOGIC ----------
+    const steps = document.querySelectorAll('.step-item');
+    const stepContents = [
+        document.getElementById('step1'),
+        document.getElementById('step2'),
+        document.getElementById('step3'),
+        document.getElementById('step4'),
+        document.getElementById('step5'),
+        document.getElementById('step6')
+    ];
+    let currentStep = 0;
+
+    function showStep(stepIndex) {
+        stepContents.forEach((c, i) => {
+            if (c) c.style.display = i === stepIndex ? 'block' : 'none';
+        });
+        steps.forEach((s, i) => {
+            s.classList.remove('active', 'completed');
+            if (i < stepIndex) s.classList.add('completed');
+            else if (i === stepIndex) s.classList.add('active');
+        });
+        currentStep = stepIndex;
+    }
+
+    document.querySelectorAll('.next-step').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (currentStep < 5) showStep(currentStep + 1);
+        });
+    });
+    document.querySelectorAll('.prev-step').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (currentStep > 0) showStep(currentStep - 1);
+        });
+    });
+
+    window.submitClaim = function() {
+        alert('✅ Claim Submitted Successfully! SRN Generated: IEPFA' + Math.floor(Math.random()*10000));
+        showScreen('screen3');
+    };
+
+    // Ensure wizard starts at step 0 when screen4 is shown
+    const observer = new MutationObserver(() => {
+        if (document.getElementById('screen4').classList.contains('active')) {
+            showStep(0);
+        }
+    });
+    observer.observe(document.getElementById('screen4'), { attributes: true, attributeFilter: ['class'] });
 
     window.onload = () => { showScreen('screen1'); };
 </script>
